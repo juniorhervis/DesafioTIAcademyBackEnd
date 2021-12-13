@@ -15,7 +15,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      ClientId: {
+      ClienteId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
