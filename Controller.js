@@ -602,7 +602,7 @@ app.get("/excluirproduto/:id", async (req, res) => {
 });
 
 //
-//---REQUISIÇÕES ITEM_COMPRA
+//---REQUISIÇÕES ITEM_COMPRA---
 //
 app.post("/itemcompra", async (req, res) => {
   await itemCompra
