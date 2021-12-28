@@ -4,7 +4,6 @@ const cors = require("cors");
 const { Sequelize } = require("./models");
 const models = require("./models");
 
-
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -13,9 +12,9 @@ let cliente = models.Cliente;
 let itemPedido = models.ItemPedido;
 let pedido = models.Pedido;
 let servico = models.Servico;
-let compra = models.Compra
-let produto = models.Produto
-let itemCompra = models.ItemCompra
+let compra = models.Compra;
+let produto = models.Produto;
+let itemCompra = models.ItemCompra;
 //
 // ----REQUISIÇÕES CLIENTE----
 //
@@ -50,6 +49,24 @@ app.get("/cliente/:id", async (req, res) => {
       });
     });
 });
+//
+//
+app.get('/cliente/:id/pedidos', async(req, res)=>{
+  await pedido.findAll({
+      where: {ClienteId: req.params.id}
+  }).then(pedidos=>{
+      return res.json({
+          error: false,            
+          pedidos
+      });
+  }).catch(erro=>{
+      return res.status(400).json({
+          error: true,
+          message: "Erro: não foi possível alterar."
+      });
+  });
+});
+
 //
 //
 app.get("/listaclientes", async (req, res) => {
@@ -146,6 +163,26 @@ app.get("/servico/:id", async (req, res) => {
 });
 //
 //
+app.get("/servico/:id/pedidos", async (req, res) => {
+  await itemPedido
+    .findAll({
+      where: { ServicoId: req.params.id },
+    })
+    .then(item => {
+      return res.json({ 
+        error: false,
+        item
+       });
+    })
+    .catch((erro) => {
+      return res.status(400).json({
+        error: true,
+        message: "Não foi possível encontrar o serviço e o pedido;",
+      });
+    });
+});
+//
+//
 app.get("/listaservicos", async (req, res) => {
   await servico
     .findAll({
@@ -224,18 +261,19 @@ app.post("/pedido", async (req, res) => {
 });
 //
 //
-app.get("/pedido/:id", async (req, res) => {
-  await pedido
-    .findByPk(req.params.id, { include: "servico_ped" })
-    .then((ped) => {
-      return res.json({ ped });
-    })
-    .catch((erro) => {
-      return res.status(400).json({
-        error: true,
-        message: "Não foi possível encontrar o pedido.",
-      });
+app.get('/pedido/:id', async(req, res) =>{  
+  pedido.findByPk(req.params.id)
+  .then(pedido =>{
+    return res.json({
+      error: false,
+      pedido
     });
+  }).catch(function(erro){
+    return res.status(400).json({
+      error: true,
+      message: "Erro: não foi possível acessar a API!"
+    });
+  });
 });
 //
 //
@@ -253,6 +291,38 @@ app.get("/listapedidos", async (req, res) => {
         message: "Foi impossível se conectar.",
       });
     });
+});
+//
+//
+app.put('/pedido/:id', async (req, res) => {
+  const ped = {
+      id: req.params.id,
+      ClienteId: req.body.ClienteId,
+      dataPedido: req.body.dataPedido
+  };
+
+  if (!await cliente.findByPk(req.body.ClienteId)){
+      return res.status(400).json({
+          error: true,
+          message: 'Cliente não existe.'
+      });
+  };
+
+  await pedido.update(ped,{
+      where: Sequelize.and({ClienteId: req.body.ClienteId},
+          {id: req.params.id})
+  }).then(pedidos=>{
+      return res.json({
+          error: false,
+          mensagem: 'Pedido foi alterado com sucesso.',
+          pedidos
+      });
+  }).catch(erro=>{
+      return res.status(400).json({
+          error: true,
+          message: "Erro: não foi possível alterar."
+      });
+  });
 });
 //
 //
@@ -317,9 +387,9 @@ app.post("/itempedido", async (req, res) => {
 //
 app.get("/itempedido/pedido/:id", async (req, res) => {
   await pedido
-    .findByPk(req.params.id, {include: "item_pedidos"})
-    .then((ped) => {
-      return res.json({ ped });
+    .findByPk(req.params.id, { include: "item_pedidos" })
+    .then((pedidos) => {
+      return res.json({ pedidos });
     })
     .catch((erro) => {
       return res.status(400).json({
@@ -390,7 +460,6 @@ app.put("/editarItem/pedido/:id", async (req, res) => {
 //
 //
 app.get("/excluiritem/pedido/:id", async (req, res) => {
-  
   if (!(await pedido.findByPk(req.params.id))) {
     return res.status(400).json({
       error: true,
@@ -399,8 +468,7 @@ app.get("/excluiritem/pedido/:id", async (req, res) => {
   }
   await itemPedido
     .destroy({
-      where:
-        { PedidoId: req.params.id }
+      where: { PedidoId: req.params.id },
     })
     .then((itens) => {
       return res.json({
@@ -545,6 +613,26 @@ app.get("/produto/:id", async (req, res) => {
 });
 //
 //
+app.get("/produto/:id/compras", async (req, res) => {
+  await itemCompra
+    .findAll({
+      where: { ProdutoId: req.params.id },
+    })
+    .then(item => {
+      return res.json({ 
+        error: false,
+        item
+       });
+    })
+    .catch((erro) => {
+      return res.status(400).json({
+        error: true,
+        message: "Não foi possível encontrar o serviço e o pedido;",
+      });
+    });
+});
+//
+//
 app.get("/listaprodutos", async (req, res) => {
   await produto
     .findAll({
@@ -624,7 +712,7 @@ app.post("/itemcompra", async (req, res) => {
 //
 app.get("/itemcompra/compra/:id", async (req, res) => {
   await compra
-    .findByPk(req.params.id, {include: "item_compras"})
+    .findByPk(req.params.id, { include: "item_compras" })
     .then((ped) => {
       return res.json({ ped });
     })
@@ -697,7 +785,6 @@ app.put("/editaritem/compra/:id", async (req, res) => {
 //
 //
 app.get("/excluiritem/compra/:id", async (req, res) => {
-  
   if (!(await compra.findByPk(req.params.id))) {
     return res.status(400).json({
       error: true,
@@ -706,8 +793,7 @@ app.get("/excluiritem/compra/:id", async (req, res) => {
   }
   await itemCompra
     .destroy({
-      where:
-        { CompraId: req.params.id }
+      where: { CompraId: req.params.id },
     })
     .then((itens) => {
       return res.json({
@@ -723,7 +809,6 @@ app.get("/excluiritem/compra/:id", async (req, res) => {
       });
     });
 });
-
 
 let port = process.env.PORT || 3001;
 
