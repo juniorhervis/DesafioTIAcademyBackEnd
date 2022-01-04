@@ -51,20 +51,23 @@ app.get("/cliente/:id", async (req, res) => {
 });
 //
 //
-app.get('/cliente/:id/pedidos', async(req, res)=>{
-  await pedido.findAll({
-      where: {ClienteId: req.params.id}
-  }).then(pedidos=>{
+app.get("/cliente/:id/pedidos", async (req, res) => {
+  await pedido
+    .findAll({
+      where: { ClienteId: req.params.id },
+    })
+    .then((pedidos) => {
       return res.json({
-          error: false,            
-          pedidos
+        error: false,
+        pedidos,
       });
-  }).catch(erro=>{
+    })
+    .catch((erro) => {
       return res.status(400).json({
-          error: true,
-          message: "Erro: não foi possível alterar."
+        error: true,
+        message: "Erro: não foi possível alterar.",
       });
-  });
+    });
 });
 
 //
@@ -88,6 +91,26 @@ app.get("/listaclientes", async (req, res) => {
 //
 //
 app.put("/atualizacliente", async (req, res) => {
+  await cliente
+    .update(req.body, {
+      where: { id: req.body.id },
+    })
+    .then(function () {
+      return res.json({
+        error: false,
+        message: "Dados alterados com sucesso!",
+      });
+    })
+    .catch((erro) => {
+      return res.status(400).json({
+        error: true,
+        message: "Não foi possível alterar dos dados",
+      });
+    });
+});
+//
+//
+app.put("/cliente/:id", async (req, res) => {
   await cliente
     .update(req.body, {
       where: { id: req.body.id },
@@ -168,11 +191,11 @@ app.get("/servico/:id/pedidos", async (req, res) => {
     .findAll({
       where: { ServicoId: req.params.id },
     })
-    .then(item => {
-      return res.json({ 
+    .then((item) => {
+      return res.json({
         error: false,
-        item
-       });
+        item,
+      });
     })
     .catch((erro) => {
       return res.status(400).json({
@@ -261,19 +284,21 @@ app.post("/pedido", async (req, res) => {
 });
 //
 //
-app.get('/pedido/:id', async(req, res) =>{  
-  pedido.findByPk(req.params.id)
-  .then(pedido =>{
-    return res.json({
-      error: false,
-      pedido
+app.get("/pedido/:id", async (req, res) => {
+  pedido
+    .findByPk(req.params.id)
+    .then((pedido) => {
+      return res.json({
+        error: false,
+        pedido,
+      });
+    })
+    .catch(function (erro) {
+      return res.status(400).json({
+        error: true,
+        message: "Erro: não foi possível acessar a API!",
+      });
     });
-  }).catch(function(erro){
-    return res.status(400).json({
-      error: true,
-      message: "Erro: não foi possível acessar a API!"
-    });
-  });
 });
 //
 //
@@ -294,35 +319,40 @@ app.get("/listapedidos", async (req, res) => {
 });
 //
 //
-app.put('/pedido/:id', async (req, res) => {
+app.put("/pedido/:id", async (req, res) => {
   const ped = {
-      id: req.params.id,
-      ClienteId: req.body.ClienteId,
-      dataPedido: req.body.dataPedido
+    id: req.params.id,
+    ClienteId: req.body.ClienteId,
+    dataPedido: req.body.dataPedido,
   };
 
-  if (!await cliente.findByPk(req.body.ClienteId)){
-      return res.status(400).json({
-          error: true,
-          message: 'Cliente não existe.'
-      });
-  };
+  if (!(await cliente.findByPk(req.body.ClienteId))) {
+    return res.status(400).json({
+      error: true,
+      message: "Cliente não existe.",
+    });
+  }
 
-  await pedido.update(ped,{
-      where: Sequelize.and({ClienteId: req.body.ClienteId},
-          {id: req.params.id})
-  }).then(pedidos=>{
+  await pedido
+    .update(ped, {
+      where: Sequelize.and(
+        { ClienteId: req.body.ClienteId },
+        { id: req.params.id }
+      ),
+    })
+    .then((pedidos) => {
       return res.json({
-          error: false,
-          mensagem: 'Pedido foi alterado com sucesso.',
-          pedidos
+        error: false,
+        mensagem: "Pedido foi alterado com sucesso.",
+        pedidos,
       });
-  }).catch(erro=>{
+    })
+    .catch((erro) => {
       return res.status(400).json({
-          error: true,
-          message: "Erro: não foi possível alterar."
+        error: true,
+        message: "Erro: não foi possível alterar.",
       });
-  });
+    });
 });
 //
 //
@@ -387,7 +417,7 @@ app.post("/itempedido", async (req, res) => {
 //
 app.get("/itempedido/pedido/:id", async (req, res) => {
   await pedido
-    .findByPk(req.params.id, { include: "item_pedidos" })
+    .findByPk(req.params.id, { include: [{ all: true }] })
     .then((pedidos) => {
       return res.json({ pedidos });
     })
@@ -618,11 +648,11 @@ app.get("/produto/:id/compras", async (req, res) => {
     .findAll({
       where: { ProdutoId: req.params.id },
     })
-    .then(item => {
-      return res.json({ 
+    .then((item) => {
+      return res.json({
         error: false,
-        item
-       });
+        item,
+      });
     })
     .catch((erro) => {
       return res.status(400).json({
