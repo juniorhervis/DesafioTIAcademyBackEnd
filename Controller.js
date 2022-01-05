@@ -90,7 +90,7 @@ app.get("/listaclientes", async (req, res) => {
 });
 //
 //
-app.put("/atualizacliente", async (req, res) => {
+app.put("/atualizacliente/:id", async (req, res) => {
   await cliente
     .update(req.body, {
       where: { id: req.body.id },
@@ -98,27 +98,7 @@ app.put("/atualizacliente", async (req, res) => {
     .then(function () {
       return res.json({
         error: false,
-        message: "Dados alterados com sucesso!",
-      });
-    })
-    .catch((erro) => {
-      return res.status(400).json({
-        error: true,
-        message: "Não foi possível alterar dos dados",
-      });
-    });
-});
-//
-//
-app.put("/cliente/:id", async (req, res) => {
-  await cliente
-    .update(req.body, {
-      where: { id: req.body.id },
-    })
-    .then(function () {
-      return res.json({
-        error: false,
-        message: "Dados alterados com sucesso!",
+        message: "Cliente alterado com sucesso!",
       });
     })
     .catch((erro) => {
@@ -145,119 +125,6 @@ app.get("/excluircliente/:id", async (req, res) => {
       return res.status(400).json({
         error: true,
         message: "Erro: impossível excluir cliente.",
-      });
-    });
-});
-
-//
-// ---REQUISIÇÕES SERVIÇOS---
-//
-
-app.post("/servico", async (req, res) => {
-  await servico
-    .create(req.body)
-    .then(function () {
-      return res.json({
-        error: false,
-        message: "Serviço criado com sucesso!",
-      });
-    })
-    .catch((erro) => {
-      return res.status(400).json({
-        error: true,
-        message: "Foi impossível se conectar.",
-      });
-    });
-});
-//
-//
-app.get("/servico/:id", async (req, res) => {
-  await servico
-    .findByPk(req.params.id, { include: [{ all: true }] })
-    .then((serv) => {
-      return res.json({ serv });
-    })
-    .catch((erro) => {
-      return res.status(400).json({
-        error: true,
-        message: "Não foi possível encontrar o servico;",
-      });
-    });
-});
-//
-//
-app.get("/servico/:id/pedidos", async (req, res) => {
-  await itemPedido
-    .findAll({
-      where: { ServicoId: req.params.id },
-    })
-    .then((item) => {
-      return res.json({
-        error: false,
-        item,
-      });
-    })
-    .catch((erro) => {
-      return res.status(400).json({
-        error: true,
-        message: "Não foi possível encontrar o serviço e o pedido;",
-      });
-    });
-});
-//
-//
-app.get("/listaservicos", async (req, res) => {
-  await servico
-    .findAll({
-      raw: true,
-    })
-    .then(function (servicos) {
-      return res.json({ servicos });
-    })
-    .catch((erro) => {
-      return res.status(400).json({
-        error: true,
-        message: "Não foi possível carregar os serviços;",
-      });
-    });
-});
-//
-//
-app.put("/atualizaservico", async (req, res) => {
-  await servico
-    .update(req.body, {
-      where: { id: req.body.id },
-    })
-    .then(function () {
-      return res.json({
-        error: false,
-        message: "Dados alterados com sucesso!",
-      });
-    })
-    .catch((erro) => {
-      return res.status(400).json({
-        error: true,
-        message: "Não foi possível alterar dos dados",
-      });
-    });
-});
-//
-//
-app.get("/excluirservico/:id", async (req, res) => {
-  await servico
-    .destroy({
-      where: { id: req.params.id },
-    })
-    .then(function () {
-      return res.json({
-        error: false,
-        message: "Serviço excluído com sucesso.",
-      });
-    })
-    .catch((erro) => {
-      return res.status(400).json({
-        error: true,
-        message: "Erro: Impossível excluir o serviço.",
       });
     });
 });
@@ -319,7 +186,7 @@ app.get("/listapedidos", async (req, res) => {
 });
 //
 //
-app.put("/pedido/:id", async (req, res) => {
+app.put("/atualizapedido/:id", async (req, res) => {
   const ped = {
     id: req.params.id,
     ClienteId: req.body.ClienteId,
@@ -343,7 +210,7 @@ app.put("/pedido/:id", async (req, res) => {
     .then((pedidos) => {
       return res.json({
         error: false,
-        mensagem: "Pedido foi alterado com sucesso.",
+        message: "Pedido foi alterado com sucesso.",
         pedidos,
       });
     })
@@ -351,26 +218,6 @@ app.put("/pedido/:id", async (req, res) => {
       return res.status(400).json({
         error: true,
         message: "Erro: não foi possível alterar.",
-      });
-    });
-});
-//
-//
-app.put("/atualizapedido", async (req, res) => {
-  await pedido
-    .update(req.body, {
-      where: { id: req.body.id },
-    })
-    .then(function () {
-      return res.json({
-        error: false,
-        message: "Dados alterados com sucesso!",
-      });
-    })
-    .catch((erro) => {
-      return res.status(400).json({
-        erro: true,
-        message: "Não foi possível alterar os dados do pedido .",
       });
     });
 });
@@ -394,6 +241,123 @@ app.get("/excluirpedido/:id", async (req, res) => {
       });
     });
 });
+
+//
+// ---REQUISIÇÕES SERVIÇOS---
+//
+
+app.post("/servico", async (req, res) => {
+  await servico
+    .create(req.body)
+    .then(function () {
+      return res.json({
+        error: false,
+        message: "Serviço criado com sucesso!",
+      });
+    })
+    .catch((erro) => {
+      return res.status(400).json({
+        error: true,
+        message: "Foi impossível se conectar.",
+      });
+    });
+});
+//
+//
+app.get("/servico/:id", async (req, res) => {
+  servico
+    .findByPk(req.params.id)
+    .then((servico) => {
+      return res.json({
+        error: false,
+        servico,
+      });
+    })
+    .catch(function (erro) {
+      return res.status(400).json({
+        error: true,
+        message: "Erro: não foi possível acessar a API!",
+      });
+    });
+});
+//
+//
+app.get("/servico/:id/pedidos", async (req, res) => {
+  await itemPedido
+    .findAll({
+      where: { ServicoId: req.params.id },
+    })
+    .then((item) => {
+      return res.json({
+        error: false,
+        item,
+      });
+    })
+    .catch((erro) => {
+      return res.status(400).json({
+        error: true,
+        message: "Não foi possível encontrar o serviço e o pedido;",
+      });
+    });
+});
+//
+//
+app.get("/listaservicos", async (req, res) => {
+  await servico
+    .findAll({
+      raw: true,
+    })
+    .then(function (servicos) {
+      return res.json({ servicos });
+    })
+    .catch((erro) => {
+      return res.status(400).json({
+        error: true,
+        message: "Não foi possível carregar os serviços;",
+      });
+    });
+});
+//
+//
+app.put("/atualizaservico/:id", async (req, res) => {
+  await servico
+    .update(req.body, {
+      where: { id: req.body.id },
+    })
+    .then(function () {
+      return res.json({
+        error: false,
+        message: "Serviço alterados com sucesso!",
+      });
+    })
+    .catch((erro) => {
+      return res.status(400).json({
+        error: true,
+        message: "Não foi possível alterar dos dados",
+      });
+    });
+});
+//
+//
+app.get("/excluirservico/:id", async (req, res) => {
+  await servico
+    .destroy({
+      where: { id: req.params.id },
+    })
+    .then(function () {
+      return res.json({
+        error: false,
+        message: "Serviço excluído com sucesso.",
+      });
+    })
+    .catch((erro) => {
+      return res.status(400).json({
+        error: true,
+        message: "Erro: Impossível excluir o serviço.",
+      });
+    });
+});
+
 //
 //---REQUISIÇÕES ITEM_PEDIDO---
 //
@@ -537,15 +501,18 @@ app.post("/compra", async (req, res) => {
 //
 //
 app.get("/compra/:id", async (req, res) => {
-  await compra
-    .findByPk(req.params.id, { include: "produto_compra" })
-    .then((ped) => {
-      return res.json({ ped });
+  compra
+    .findByPk(req.params.id)
+    .then((compra) => {
+      return res.json({
+        error: false,
+        compra,
+      });
     })
-    .catch((erro) => {
+    .catch(function (erro) {
       return res.status(400).json({
         error: true,
-        message: "Não foi possível encontrar a compra.",
+        message: "Erro: não foi possível acessar a API!",
       });
     });
 });
@@ -568,21 +535,38 @@ app.get("/listacompras", async (req, res) => {
 });
 //
 //
-app.put("/atualizacompra", async (req, res) => {
+app.put("/atualizacompra/:id", async (req, res) => {
+  const comp = {
+    id: req.params.id,
+    ClienteId: req.body.ClienteId,
+    data: req.body.data,
+  };
+
+  if (!(await cliente.findByPk(req.body.ClienteId))) {
+    return res.status(400).json({
+      error: true,
+      message: "Cliente não existe.",
+    });
+  }
+
   await compra
-    .update(req.body, {
-      where: { id: req.body.id },
+    .update(comp, {
+      where: Sequelize.and(
+        { ClienteId: req.body.ClienteId },
+        { id: req.params.id }
+      ),
     })
-    .then(function () {
+    .then((compras) => {
       return res.json({
         error: false,
-        message: "Dados alterados com sucesso!",
+        message: "Compra alterada com sucesso.",
+        compras,
       });
     })
     .catch((erro) => {
       return res.status(400).json({
-        erro: true,
-        message: "Não foi possível alterar os dados da compra .",
+        error: true,
+        message: "Erro: não foi possível alterar.",
       });
     });
 });
