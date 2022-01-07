@@ -327,7 +327,7 @@ app.put("/atualizaservico/:id", async (req, res) => {
     .then(function () {
       return res.json({
         error: false,
-        message: "Serviço alterados com sucesso!",
+        message: "Serviço alterado com sucesso!",
       });
     })
     .catch((erro) => {
@@ -614,9 +614,12 @@ app.post("/produto", async (req, res) => {
 //
 app.get("/produto/:id", async (req, res) => {
   await produto
-    .findByPk(req.params.id, { include: [{ all: true }] })
-    .then((prod) => {
-      return res.json({ prod });
+    .findByPk(req.params.id)
+    .then((produto) => {
+      return res.json({
+        erro: false,
+        produto
+      });
     })
     .catch((erro) => {
       return res.status(400).json({
@@ -664,7 +667,7 @@ app.get("/listaprodutos", async (req, res) => {
 });
 //
 //
-app.put("/atualizaproduto", async (req, res) => {
+app.put("/atualizaproduto/:id", async (req, res) => {
   await produto
     .update(req.body, {
       where: { id: req.body.id },
@@ -672,7 +675,7 @@ app.put("/atualizaproduto", async (req, res) => {
     .then(function () {
       return res.json({
         error: false,
-        message: "Dados alterados com sucesso!",
+        message: "Produto alterado com sucesso!",
       });
     })
     .catch((erro) => {
