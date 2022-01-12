@@ -381,7 +381,7 @@ app.post("/itempedido", async (req, res) => {
 //
 app.get("/itempedido/pedido/:id", async (req, res) => {
   await pedido
-    .findByPk(req.params.id, { include: [{ all: true }] })
+    .findByPk(req.params.id, { include: ["item_pedidos" ]})
     .then((pedidos) => {
       return res.json({ pedidos });
     })
