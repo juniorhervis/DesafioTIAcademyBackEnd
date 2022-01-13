@@ -381,7 +381,7 @@ app.post("/itempedido", async (req, res) => {
 //
 app.get("/itempedido/pedido/:id", async (req, res) => {
   await pedido
-    .findByPk(req.params.id, { include: ["item_pedidos" ]})
+    .findByPk(req.params.id, { include: ["item_pedidos"]})
     .then((pedidos) => {
       return res.json({ pedidos });
     })
@@ -715,7 +715,7 @@ app.post("/itemcompra", async (req, res) => {
     .then(function () {
       return res.json({
         erro: false,
-        message: "item criado com sucesso!",
+        message: "Item criado com sucesso!",
       });
     })
     .catch((erro) => {
