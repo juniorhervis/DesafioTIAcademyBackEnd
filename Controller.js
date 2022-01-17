@@ -411,7 +411,7 @@ app.get("/listaitempedidos", async (req, res) => {
 });
 //
 //
-app.put("/editarItem/pedido/:id", async (req, res) => {
+app.put("/editaritem/pedido/:id", async (req, res) => {
   const item = {
     quantidade: req.body.quantidade,
     valor: req.body.valor,
@@ -729,9 +729,9 @@ app.post("/itemcompra", async (req, res) => {
 //
 app.get("/itemcompra/compra/:id", async (req, res) => {
   await compra
-    .findByPk(req.params.id, { include: "item_compras" })
-    .then((ped) => {
-      return res.json({ ped });
+    .findByPk(req.params.id, { include: ["item_compras"] })
+    .then((compras) => {
+      return res.json({ compras });
     })
     .catch((erro) => {
       return res.status(400).json({
