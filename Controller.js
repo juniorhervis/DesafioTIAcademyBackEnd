@@ -72,6 +72,28 @@ app.get("/cliente/:id/pedidos", async (req, res) => {
 
 //
 //
+
+app.get("/cliente/:id/compras", async (req, res) => {
+  await compra
+    .findAll({
+      where: { ClienteId: req.params.id },
+    })
+    .then((compras) => {
+      return res.json({
+        error: false,
+        compras,
+      });
+    })
+    .catch((erro) => {
+      return res.status(400).json({
+        error: true,
+        message: "Erro: não foi possível alterar.",
+      });
+    });
+});
+
+//
+//
 app.get("/listaclientes", async (req, res) => {
   await cliente
     .findAll()
